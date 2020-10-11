@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.snow.fvmusic.dao.CommentVODao">
+
+    <resultMap id="BaseResult" type="com.snow.fvmusic.vo.CommentVO">
+        <result property="username" column="username"/>
+        <result property="content" column="content"/>
+        <result property="userId" column="userId"/>
+        <result property="userAvatarUrl" column="user_avatar_url"/>
+        <result property="createDatetime" column="create_datetime"/>
+        <collection property="childrenComments" ofType="com.snow.fvmusic.vo.CommentVO" columnPrefix="child_">
+            <result property="username" column="username"/>
+            <result property="userId" column="userId"/>
+            <result property="content" column="content"/>
+            <result property="userAvatarUrl" column="user_avatar_url"/>
+            <result property="createDatetime" column="create_datetime"/>
+        </collection>
+    </resultMap>
+
+    <select id="getCommentsOfArticle" resultMap="BaseResult">
+        select c1.content content,c1.user_id userId, u1.username username, u1.avatar_url user_avatar_url,
+        c1.create_datetime create_datetime,
+        c2.content child_content, c2.user_id child_userId, u2.username child_username,
+        u2.avatar_url child_user_avatar_url, c2.create_datetime child_create_datetime
+        from comment c1 left join user u1 on c1.user_id = u1.id,
+        comment c2 left join user u2 on c2.user_id = u2.id
+        where c1.level = 0 and c2.parent_id = c1.id and c1.article_id = #{articleId}
+        order by create_datetime desc
+        <if test="limit !=null">
+            limit #{limit}
+        </if>
+    </select>
+</mapper>

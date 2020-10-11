@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.snow.fvmusic.dao.ArticleVODao">
+    <resultMap id="BaseResultMap" type="com.snow.fvmusic.vo.ArticleVO">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="content" column="content" jdbcType="LONGVARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="commentCount" column="comment_count" jdbcType="INTEGER"/>
+        <result property="greatCount" column="great_count" jdbcType="INTEGER"/>
+        <result property="photosUrl" column="photos_url" jdbcType="VARCHAR"/>
+        <result property="musicWYId" column="music_wangyi_id" jdbcType="INTEGER"/>
+        <result property="username" column="creator" jdbcType="VARCHAR"/>
+        <result property="userAvatarUrl" column="user_avatar_url" jdbcType="VARCHAR"/>
+        <result property="userId" column="userId" jdbcType="BIGINT"/>
+        <result property="views" column="views" jdbcType="INTEGER"/>
+        <result property="articleCreatDateTime" column="create_datetime" jdbcType="DATE"/>
+    </resultMap>
+
+    <select id="getArticlesVOPage" resultMap="BaseResultMap">
+        select
+            a.content content, a.name name, a.comment_count comment_count,a.id,
+            a.great_count great_count, a.photos_url photos_url,a.views views,
+            a.create_datetime, create_datetime,u.username creator, u.id userId, u.avatar_url user_avatar_url,
+            m.wangyi_id music_wangyi_id
+        from article a left join user u on a.user_id = u.id
+        left join music_info m on a.music_info_id = m.id
+        where
+        a.pool_id = #{poolId}
+        <if test="orderBy != null">
+            order by #{orderBy} #{order}
+        </if>
+        <if test="orderBy==null">
+            order by create_datetime desc
+        </if>
+    </select>
+    <select id="getArticleById" resultMap="BaseResultMap">
+        select
+            a.content content, a.name name, a.comment_count comment_count,
+            a.great_count great_count, a.photos_url photos_url,a.views views,
+            a.create_datetime, create_datetime,u.username creator, u.id userId, u.avatar_url user_avatar_url,
+            m.wangyi_id music_wangyi_id
+        from article a left join user u on a.user_id = u.id
+        left join music_info m on a.music_info_id = m.id
+        where a.id = #{id}
+    </select>
+
+    <update id="incrCommentCount">
+        select * from article where id = #{articleId} for update
+        update article
+        set comment_count = comment_count + 1
+        where id = #{articleId}
+    </update>
+
+    <update id="incrGreatCount">
+        update article
+        set great_count = great_count + 1
+        where id = #{articleId}
+    </update>
+
+    <update id="incrViews">
+        update article
+        set views = views + 1
+        where id = #{articleId}
+    </update>
+
+    <update id="incrViewsBatch" parameterType="list">
+        update article
+        set views = views + 1
+        where id in
+        <foreach collection="articleIds" item="id" open="(" close=")" separator=",">
+            #{id, jdbcType=BIGINT}
+        </foreach>
+
+    </update>
+</mapper>

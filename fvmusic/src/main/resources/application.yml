@@ -1,0 +1,66 @@
+spring:
+  profiles:
+    active: prod
+  mail:
+    default-encoding: utf-8
+    host: smtp.163.com
+    username: # 你的要发送邮件的邮箱
+    password: # 网页版网易邮箱开通smtp服务，查看密码，不是邮箱的登录密码
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            enable: true #ssl要开启，不然部署到阿里云服务器上不能连接到邮件服务器
+    port: 465  #要使用465端口，阿里云服务器禁止了出方向的25端口
+
+
+
+
+jwt:
+  tokenHeader: Authorization
+  secret: shop-admin-secret
+  expiration: 86400
+  tokenHead: 'Bearer'
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*.xml
+
+  #需要登录后才能访问的接口
+secure:
+  authenticated:
+    urls:
+      - /pools/create
+      - /pools/delete/*
+      - /pools/update
+      - /artice/create
+      - /updatePassword
+      - /updateUserInfo
+      - /userInfo/update
+      - /userInfo/updateAvatar
+      - /userInfo/uploadBackground
+      - /artilce/comment
+      - /artilce/goreat
+redis:
+  database: fvmusic
+  key: userInfo
+  expired:
+    userExpired: 604800
+  message:
+    comment: MESSAGE_COMMENT_
+    great: MESSAGE_GREAT_
+#阿里云oss服务
+aliyun:
+  oss:
+    accessKeyId: #
+    accessKeySecret： #
+    endpoint: oss-cn-shanghai.aliyuncs.com
+    bucketName: #
+    policy:
+      expire: 6000
+    maxSize: 20
+    callback: http://localhost:/fvmusic/aliyun/oss/callback
+    dir:
+      prefix: fvmusic/images

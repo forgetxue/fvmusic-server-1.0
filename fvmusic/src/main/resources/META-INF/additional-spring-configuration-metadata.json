@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "spring.secure.authenticated.urls",
+      "type": "java.lang.String",
+      "description": "Description for spring.secure.authenticated.urls."
+  }
+] }

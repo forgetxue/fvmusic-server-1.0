@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.snow.fvmusic.dao.MusicPoolDtoDao">
+    <resultMap id="BaseResultMap" type="com.snow.fvmusic.dto.MusicPoolDto">
+        <result property="createUserId" column="create_user_id" jdbcType="BIGINT"/>
+        <result property="createUsername" column="create_username" jdbcType="VARCHAR"/>
+        <result property="musicTypeName" column="music_type_name" jdbcType="BIGINT"/>
+        <result property="musicStyleId" column="styleId" jdbcType="BIGINT"/>
+        <result property="wangyiMusicId" column="main_music_id" jdbcType="INTEGER"/>
+        <association property="musicPool" javaType="com.snow.fvmusic.generator.entities.MusicPool">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="articleCount" column="article_count"/>
+            <result property="introduce" column="introduce" jdbcType="VARCHAR"/>
+            <result property="coverUrl" column="cover_url" jdbcType="VARCHAR"/>
+            <result property="gustCount" column="gust_count" jdbcType="INTEGER"/>
+            <result property="articleCount" column="article_count" jdbcType="INTEGER"/>
+            <result property="recentUserCount" column="recent_user_count" jdbcType="INTEGER"/>
+        </association>
+    </resultMap>
+    <select id="getRecommendPool" resultMap="BaseResultMap">
+        SELECT p.id , p.name,p.article_count,p.introduce,p.cover_url, p.gust_count, p.recent_user_count,
+        u.username as create_username, u.id as create_user_id,m.id as main_music_info,
+        m.wangyi_id as main_music_id,t.name as music_type_name, t.id as styleId
+        FROM
+        music_pool p
+        left join `user` u on p.create_user_id = u.id
+        left join music_info m on p.main_music_info = m.id
+        left join music_style t on p.music_type_id = t.id
+        order by p.gust_count desc
+    </select>
+
+    <select id="getMusicPoolsByStyle" resultMap="BaseResultMap">
+        SELECT p.id, p.name,p.article_count,p.introduce,p.cover_url, p.gust_count, p.recent_user_count,
+        u.username as create_username, u.id as create_user_id,m.id as main_music_info,
+        m.wangyi_id as main_music_id,t.name as  music_type_name, t.id as styleId
+        FROM
+        music_pool p
+        left join `user` u on p.create_user_id = u.id
+        left join music_info m on p.main_music_info = m.id
+        left join music_style t on p.music_type_id = t.id
+        WHERE
+        t.id = #{styleId, jdbcType = BIGINT}
+        ORDER BY p.gust_count DESC
+    </select>
+</mapper>
